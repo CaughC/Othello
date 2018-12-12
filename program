@@ -6,13 +6,13 @@ def put(person,y,x):
         if y != 0:
             if board[y-1][x-1] != person:
                 change.append([-1,-1,y,x])
-            if board[y-1][x] != person:
-                change.append([-1,0,y,x])
         if y != 7:
-            if board[y+1][x] != person:
-                change.append([1,0,y,x])
             if board[y+1][x-1] != person:
                 change.append([1,-1,y,x])
+    if y != 0 and board[y-1][x] != person:
+        change.append([-1,0,y,x])
+    if y != 7 and board[y+1][x] != person:
+        change.append([1,0,y,x])
     if x != 7:
         if board[y][x+1] != person:
             change.append([0,1,y,x])
@@ -56,6 +56,9 @@ def changeColor(person,opponent,directionY,directionX,y,x):
         subjectX += directionX
         subjectY += directionY
 
+print("オセロを始めます。")
+print("コンピュータを相手にする場合は1を、対人戦を行う場合は2を入力してください")
+How2play = int(input())
 print("先攻使う文字（1字)を入力してください")
 player1 = input()
 print("後攻攻使う文字（1字)を入力してください")
@@ -72,18 +75,27 @@ for i in range(8):
 board[3][3],board[4][4] = player1,player1
 board[3][4],board[4][3] = player2,player2
 
+verticalCharacter = ['A','B','C','D','E','F','G','H']
+
 skip = 0
-while skip <= 2:
+while skip < 2:
+    print(' 0 1 2 3 4 5 6 7')
     for i in range(8):
-        print(' '.join(board[i]))
+        print(verticalCharacter[i] + ' '.join(board[i]))
     while True:
-        print("先攻どこに置くか入力してください(左上を0 0、右上を0 7、右下を7 7とする)(置く場所が無いならskip)")
-        command = input()
-        if command == skip:
+        print("先攻どこに置くか入力(左上をA 0、右上をA 7、右下を7 7とする)(置く場所が無いならskip)")
+        command = []
+        command = input().split(' ')
+        if command[0] =="skip":
             skip += 1
             break
-        place = []
-        place = command.split(' ')
+        if verticalCharacter.count(command[0]) == 0 or not command[1].isnumeric():
+            print("その値は無効です。再入力してください")
+            continue
+        if int(command[1]) < 0 or int(command[1]) > 7:
+            print("その値は無効です。再入力してください")
+            continue        
+        place = [verticalCharacter.index(command[0]),int(command[1])]        
         if board[int(place[0])][int(place[1])] == player1 or board[int(place[0])][int(place[1])] == player2:
             print("その場所には置けません")
             continue
@@ -104,17 +116,25 @@ while skip <= 2:
                 del check[i]                            
             for i in range(len(check)):
                 changeColor(player1,player2,check[i][0],check[i][1],check[i][2],check[i][3])
+                skip = 0
         break
+    print(' 0 1 2 3 4 5 6 7')
     for i in range(8):
-        print(' '.join(board[i]))
+        print(verticalCharacter[i] + ' '.join(board[i]))
     while True:
-        print("後攻どこに置くか入力してください(左上を0 0、右上を0 7、右下を7 7とする)(置く場所が無いならskip)")
-        command = input()
-        if command == skip:
+        print("後攻どこに置くか入力(左上をA 0、右上をA 7、右下を7 7とする)(置く場所が無いならskip)")
+        command = []
+        command = input().split(' ')
+        if command[0] == "skip":
             skip += 1
             break
-        place = []
-        place = command.split(' ')
+        if verticalCharacter.count(command[0]) == 0 or not command[1].isnumeric():
+            print("その値は無効です。再入力してください")
+            continue
+        if int(command[1]) < 0 or int(command[1]) > 7:
+            print("その値は無効です。再入力してください")
+            continue        
+        place = [verticalCharacter.index(command[0]),int(command[1])]
         if board[int(place[0])][int(place[1])] == player1 or board[int(place[0])][int(place[1])] == player2:
             print("その場所には置けません")
             continue
@@ -135,8 +155,9 @@ while skip <= 2:
                 del check[int(i)]                           
             for i in range(len(check)):
                 changeColor(player2,player1,check[i][0],check[i][1],check[i][2],check[i][3])
+                skip = 0
         break
-result = 0
+result = ""
 for i in range(7):
     result += ''.join(board[i])
 player1score = 0
